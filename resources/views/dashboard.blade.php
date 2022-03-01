@@ -35,6 +35,7 @@
 
                     <ul class="bg-slate-300 px-10 py-4 inline-block">
                         @forelse ($pending_tasks->slice(0,5) as $task )
+
                           <li><a class="hover:text-amber-900" href=" {{ route('task.show', $task->slug)}}">{{ $task->name}}</a></li>
                           @empty
                           <li>No Tasks Found!</li>
