@@ -15,7 +15,8 @@
 
                     @if (count($clients)== 0)
                     <div class="bg-orange-500 text-white text-center p-3">
-                        <p>You don't have any client <a  href="{{route('client.create')}} " class="bg-black text-white px-3 py-1 rounded-md ml-1 ">Add New Client</a></p>
+                        <p>You don't have any client <a  href="{{route('client.create')}} "
+                            class="bg-black text-white px-3 py-1 rounded-md ml-1 ">Add New Client</a></p>
                         <p>You have to define client first!</p>
                     </div>
                     @endif

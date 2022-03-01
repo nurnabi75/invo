@@ -8,7 +8,7 @@
         </div>
     </x-slot>
 
-   @include('layouts.messages')
+
 
 
     <div class="py-12">

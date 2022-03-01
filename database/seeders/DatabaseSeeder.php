@@ -40,10 +40,10 @@ class DatabaseSeeder extends Seeder
 
         //         ]);
 
-        Client::factory(5)->create();
+        Client::factory(10)->create();
 
-         Task::factory(10)->create();
+         Task::factory(30)->create();
 
-         Invoice::factory(10)->create();
+         Invoice::factory(20)->create();
     }
 }
