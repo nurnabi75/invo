@@ -1,0 +1,12 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+
+.formlabel{
+    @apply cursor-pointer block text-sm mb-1;
+}
+.forminput{
+    @apply w-full rounded-sm;
+}
+
