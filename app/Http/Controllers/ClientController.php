@@ -44,7 +44,6 @@ class ClientController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-
             'name' => ['required','max:255','string'],
             'username' => ['required','max:255','string'],
             'email' => ['required','max:255','string','email'],
@@ -52,18 +51,13 @@ class ClientController extends Controller
             'country' => ['max:255','string', 'not_in:none'],
             'status' => ['not_in:none','string'],
             'thumbnail' => ['image']
-
         ]);
-
+       try {
         $thumb=null;
-
         if(! empty($request->file('thumbnail' )) ){
             $thumb = time() . '-' . $request->file('thumbnail')->getClientOriginalName();
             $request->file('thumbnail')->storeAs('public/uploads', $thumb);
         }
-
-
-
         Client::create([
             'name' => $request->name,
             'username' => $request->username,
@@ -73,11 +67,11 @@ class ClientController extends Controller
             'status' => $request->status,
             'user_id' => Auth::user()->id,
             'thumbnail' => $thumb,
-
         ]);
-
-
         return redirect()->route('client.index')->with('success','Client Added Successfully!');
+       } catch (\Throwable $th) {
+        return redirect()->route('client.index')->with('error',$th->getMessage());
+       }
     }
 
     /**

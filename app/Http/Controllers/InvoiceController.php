@@ -221,7 +221,7 @@ class InvoiceController extends Controller
         ];
 
        // InvoiceEmailjob::dispatch($data);
-       dispatch(new InvoiceEmailjob($data));
+       Mail::send(new InvoiceEmail($data));
 
         $invoice->update([
             'email_sent'  =>'yes'
