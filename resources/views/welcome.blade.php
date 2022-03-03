@@ -25,6 +25,7 @@
                 hover:bg-orange-400 transition-all duration-300 hover:text-white inline-block">Dashboard</a>
 
                 @else
+
                 <a href="{{ route('login') }}"
                 class="border border-orange-400 px-5 py-1 mt-3
                 hover:bg-orange-400 transition-all duration-300 hover:text-white inline-block">Login</a>
