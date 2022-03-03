@@ -20,6 +20,7 @@ class CreateUsersTable extends Migration
             $table->string('company')->nullable();
             $table->string('phone')->nullable();
             $table->string('country')->nullable();
+            $table->string('invoice_logo')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('thumbnail')->nullable();

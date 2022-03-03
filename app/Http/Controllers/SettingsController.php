@@ -18,27 +18,34 @@ class SettingsController extends Controller
 
     public function update(Request $request)
     {
+        //
         $request->validate([
             'name'    => ['required' , 'max:255' , 'string'],
             'email'   => ['required' , 'max:255' , 'string'],
-            'company' => [ 'max:255' , 'string'],
-            'phone'   => [ 'max:255' , 'string'],
-            'country' => [ 'max:255' , 'string'],
+            'company' => [ 'nullable', 'max:255' , 'string'],
+            'phone'   => [ 'nullable', 'max:255' , 'string'],
+            'country' => [ 'nullable', 'max:255' , 'string'],
         ]);
-        $user = User::find(Auth::id());
+        try {
+            // get current user
+            $user = User::find(Auth::id());
 
-        $thumb = $user->thumbnail;
+            // get defould thambnail thumbnail
+          $thumb = $user->thumbnail;
+         // upload new thumbnail
         if(! empty($request->file('thumbnail'))){
             Storage::delete('public/uploads/'.$thumb);
             $filename =strtolower(str_replace(' ','-', $request->file('thumbnail')->getClientOriginalName()));
             $thumb = time() . '-' .$filename ;
             $request->file('thumbnail')->storeAs('public/uploads', $thumb);
         }
+         $invoice =$user->invoice_logo;
+        // upload new invoice logo
         if(! empty($request->file('invoice_logo'))){
-            $invoice = 'invoice.png';
+            $invoice =time(). '-invoice.png';
             $request->file('invoice_logo')->storeAs('public/uploads', $invoice);
         }
-
+        // update user data
         $user->update([
             'name'    => $request->name,
             'email'   => $request->email,
@@ -46,9 +53,14 @@ class SettingsController extends Controller
             'phone'   => $request->phone,
             'country' => $request->country,
             'thumbnail' => $thumb,
+            'invoice_logo' => $invoice,
         ]);
-
-        return redirect()->back()->with('success', 'User Updated!');
+        //return response
+        return redirect()->route('settings.index')->with('success', 'User Updated!');
+        } catch (\Throwable $th) {
+            //throw $th
+            return redirect()->route('settings.index')->with('error', $th->getMessage());
+        }
     }
 
     //country list
