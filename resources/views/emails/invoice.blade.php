@@ -1,5 +1,5 @@
 @component('mail::message')
-# Welcome
+# Welcome, {{ $client->name }}
 
 Here is the latest invoice.
 

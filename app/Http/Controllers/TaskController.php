@@ -53,7 +53,7 @@ class TaskController extends Controller
     public function create()
     {
         return view ('task.create')->with([
-            'clients' =>Client::all(),
+            'clients' =>Client::where('user_id',Auth::id())->get(),
         ]);
     }
 
@@ -114,7 +114,6 @@ class TaskController extends Controller
             'name'      => ['required' , 'max:255' , 'string'],
             'price'     => ['required' , 'integer'],
             'client_id' => ['required' , 'max:255' ,'not_in:none'],
-            'description' => ['required'],
         ]);
     }
 
@@ -127,9 +126,11 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
-
+        //validation
         $this->taskValidation($request);
 
+      try {
+          //update data
         $task->update([
             'name' =>$request->name,
             'slug' =>Str::slug($request->name),
@@ -139,8 +140,13 @@ class TaskController extends Controller
             'user_id' =>Auth::user()->id,
 
         ]);
-
+        // Return
         return redirect()->route('task.index')->with('success' , 'Task Updated');
+      } catch (\Throwable $th) {
+
+        //Throw $th
+        return redirect()->route('task.index')->with('error' , $th->getMessage());
+      }
     }
 
     /**

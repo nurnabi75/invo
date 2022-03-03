@@ -24,7 +24,8 @@ class InvoiceController extends Controller
 
     public function index(Request $request)
     {
-        $invoices=Invoice::with('client')->latest();
+        // Get latest Invoice
+        $invoices=Invoice::with('client')->where('user_id', Auth::id())->latest();
 
         if(!empty($request->client_id) ){
             $invoices = $invoices->where('client_id',$request->client_id);
@@ -79,7 +80,7 @@ class InvoiceController extends Controller
     public function update(Request $request, Invoice $invoice)
     {
         $invoice->update([
-         'status' =>'paid'
+         'status' =>$invoice->status == 'unpaid' ? 'paid' : 'unpaid'
         ]);
 
         return redirect()->route('invoice.index')->with('success', 'Invoice Payment Mark As Paid');
@@ -93,7 +94,6 @@ class InvoiceController extends Controller
     {
         Storage::delete('public/invoices/'.$invoice->download_url);
         $invoice->delete();
-
         return redirect()->route('invoice.index')->with('success' , 'Invoice deleted successful');
     }
 
@@ -105,7 +105,6 @@ class InvoiceController extends Controller
     public function getInvoiceData(Request $request)
     {
         $tasks =Task::latest();
-
         if(!empty($request->client_id) ){
             $tasks = $tasks->where('client_id', '=' , $request->client_id);
         }
@@ -118,7 +117,6 @@ class InvoiceController extends Controller
         if(!empty($request->endDate) ){
          $tasks = $tasks->whereDate('created_at', '<=' , $request->endDate);
          }
-
          return $tasks->get();
     }
 
@@ -133,10 +131,8 @@ class InvoiceController extends Controller
 //invoice generate function preview
     public function invoice(Request $request)
     {
-
         if(!empty($request->generate)&& $request->generate == 'yes'){
             $this->generate($request);
-
             return redirect()->route('invoice.index')->with('success', 'invoice Created');
         }
         if(!empty($request->preview)&& $request->preview == 'yes'){
@@ -148,8 +144,6 @@ class InvoiceController extends Controller
                 $discount = 0;
                 $discount_type = '';
             }
-
-
             $tasks = Task::whereIn('id',$request->invoice_ids)->get();
         return view('invoice.preview')->with([
             'invoice_no' => 'INVO_'.rand(25855263525,25655554566),
@@ -166,12 +160,8 @@ class InvoiceController extends Controller
     *PDF Generation
     *Invoice Insert
     */
-
     public function generate(Request $request)
     {
-
-
-
             if(!empty($request->discount) && !empty($request->discount_type) ){
                 $discount = $request->discount;
                 $discount_type = $request->discount_type;
@@ -179,7 +169,6 @@ class InvoiceController extends Controller
                 $discount = 0;
                 $discount_type = '';
             }
-
 
         $invo_no ='INVO_'.rand(25855263525,25655554566);
 
@@ -203,35 +192,25 @@ class InvoiceController extends Controller
             'status'     =>'unpaid',
             'amount'     =>$tasks->sum('price'),
             'download_url'=>$invo_no.'.pdf',
-
-
         ]);
-
-
     }
-
 
      public function sendEmail(Invoice $invoice)
     {
-
         $data =[
             'user'        => Auth::user(),
             'invoice_id'  => $invoice->invoice_id,
             'invoice'     => $invoice,
+            'pdf'     =>public_path('storage/invoices/'.$invoice->download_url),
         ];
-
        // InvoiceEmailjob::dispatch($data);
-       Mail::send(new InvoiceEmail($data));
+
+       Mail::to($invoice->client)->send(new InvoiceEmail($data));
 
         $invoice->update([
             'email_sent'  =>'yes'
         ]);
-
         return redirect()->route('invoice.index')->with('success','Email Send');
     }
-
-
-
-
 
 }

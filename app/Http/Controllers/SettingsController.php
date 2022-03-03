@@ -25,26 +25,18 @@ class SettingsController extends Controller
             'phone'   => [ 'max:255' , 'string'],
             'country' => [ 'max:255' , 'string'],
         ]);
-
         $user = User::find(Auth::id());
 
         $thumb = $user->thumbnail;
-
         if(! empty($request->file('thumbnail'))){
             Storage::delete('public/uploads/'.$thumb);
-
-            $thumb = time() . '-' . $request->file('thumbnail')->getClientOriginalName();
-
+            $filename =strtolower(str_replace(' ','-', $request->file('thumbnail')->getClientOriginalName()));
+            $thumb = time() . '-' .$filename ;
             $request->file('thumbnail')->storeAs('public/uploads', $thumb);
-
         }
-
         if(! empty($request->file('invoice_logo'))){
-
             $invoice = 'invoice.png';
-
             $request->file('invoice_logo')->storeAs('public/uploads', $invoice);
-
         }
 
         $user->update([
@@ -56,12 +48,10 @@ class SettingsController extends Controller
             'thumbnail' => $thumb,
         ]);
 
-
-
-
         return redirect()->back()->with('success', 'User Updated!');
     }
 
+    //country list
     public $countries_list = array(
         "AF" => "Afghanistan",
         "AX" => "Aland Islands",

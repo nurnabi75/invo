@@ -29,7 +29,7 @@
                         <div class="mt-6 flex">
                            <div class=" flex-1">
                             <label for="name" class="formlabel">Name</label>
-                            <input type="text" name="name" id="name" class="forminput" value="{{old('name')}}">
+                            <input  type="text" name="name" id="name" class="forminput " value="{{old('name')}}">
 
                             @error('name')
                                 <p class="text-red-700 text-sm">{{$message}}</p>
@@ -56,7 +56,7 @@
                                 <option value="none">Selected Client</option>
 
                                 @foreach ($clients as $client )
-                                <option value="{{$client->id}}" {{ $client->id == old('client_id') ? 'selected' : '' }} > {{$client->name}}</option>
+                                <option  value="{{$client->id}}" {{ $client->id == old('client_id') ? 'selected' : '' }} > {{$client->name}}</option>
                                 @endforeach
 
                             </select>

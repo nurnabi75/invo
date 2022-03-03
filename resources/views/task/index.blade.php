@@ -102,7 +102,7 @@
                         <tbody>
 
 
-                            @foreach ($tasks as $task)
+                            @forelse ($tasks as $task)
 
                             <tr>
 
@@ -146,8 +146,12 @@
 
                                 </td>
                             </tr>
+                            @empty
+                            <tr>
+                                <td class="border py-2 text-center text-red-600" colspan="5">No Tasks Found!</td>
+                            </tr>
 
-                            @endforeach
+                            @endforelse
 
 
                         </tbody>

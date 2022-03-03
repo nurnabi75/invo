@@ -43,6 +43,7 @@ class ClientController extends Controller
      */
     public function store(Request $request)
     {
+        // Data Validation
         $request->validate([
             'name' => ['required','max:255','string'],
             'username' => ['required','max:255','string'],
@@ -58,6 +59,7 @@ class ClientController extends Controller
             $thumb = time() . '-' . $request->file('thumbnail')->getClientOriginalName();
             $request->file('thumbnail')->storeAs('public/uploads', $thumb);
         }
+        //Create new client
         Client::create([
             'name' => $request->name,
             'username' => $request->username,
@@ -68,8 +70,10 @@ class ClientController extends Controller
             'user_id' => Auth::user()->id,
             'thumbnail' => $thumb,
         ]);
+        //Return response
         return redirect()->route('client.index')->with('success','Client Added Successfully!');
        } catch (\Throwable $th) {
+           // throw $th
         return redirect()->route('client.index')->with('error',$th->getMessage());
        }
     }
@@ -82,7 +86,9 @@ class ClientController extends Controller
      */
     public function show(Client $client)
     {
+        // Client with tasks and invoice
         $client =$client->load('tasks','invoices');
+        //Return view
         return view('client.profile')->with([
             'client'=> $client,
             'pending_tasks' => $client->tasks->where('status','pending'),
