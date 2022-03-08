@@ -33,7 +33,6 @@
                               <p class="text-red-700 text-sm">{{$message}}</p>
                             @enderror
                            </div>
-
                         </div>
 
                        <div class="mt-6 flex">
