@@ -35,7 +35,7 @@ class InvoiceEmail extends Mailable  implements ShouldQueue
 
 
         return $this->markdown('emails.invoice',['client'=>$client])
-            ->from('info.nuragency.xyz', $user->name)
+            ->from(env('MAIL_FROM_ADDRESS'), $user->name)
             ->replyTo($user->email, $user->name)
             ->subject($invoice_id)
 
