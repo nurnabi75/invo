@@ -17,7 +17,7 @@ class TaskController extends Controller
      */
     public function index(Request $request)
     {
-        $tasks = Task::where('user_id',Auth::user()->id)->orderBy('id' , 'DESC');
+        $tasks = Task::where('user_id',Auth::user()->id)->orderBy('status','ASC')->orderBy('end_date', 'ASC' )->orderBy('priority' , 'DESC');
         // dd($tasks->get());
 
         if( !empty($request->client_id) ){
@@ -75,6 +75,10 @@ class TaskController extends Controller
             'description' =>$request->description,
             'client_id' =>$request->client_id,
             'user_id' =>Auth::user()->id,
+            'start_date' =>$request->start_date,
+            'end_date' =>$request->end_date,
+            'priority' =>$request->priority,
+
 
         ]);
 
@@ -111,9 +115,12 @@ class TaskController extends Controller
     public function taskValidation(Request $request)
     {
         return  $request->validate([
-            'name'      => ['required' , 'max:255' , 'string'],
-            'price'     => ['required' , 'integer'],
-            'client_id' => ['required' , 'max:255' ,'not_in:none'],
+            'name'       => ['required' , 'max:255' , 'string'],
+            'client_id'  => ['required' , 'max:255' ,'not_in:none'],
+            'price'      => ['required' , 'integer'],
+            'start_date' => ['required' , 'max:255'],
+            'end_date'   => ['required' , 'max:255'],
+            'priority'   => ['required' , 'max:255','not_in:none'],
         ]);
     }
 

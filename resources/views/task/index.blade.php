@@ -95,6 +95,7 @@
                                 <th  class="border py-2">Name</th>
                                 <th class="border py-2 w-20">Price</th>
                                 <th class="border py-2 w-40">status</th>
+                                <th class="border py-2 w-32">Priority</th>
                                 <th class="border py-2">Client</th>
                                 <th class="border py-2">Action</th>
                             </tr>
@@ -106,8 +107,63 @@
 
                             <tr>
 
-                                <td class="border py-2 text-left px-2 ">
-                                    <a class="font-bold text-neutral-900 hover:text-orange-400 " href="{{route('task.show' , $task->slug)}}">{{$task->name}}</a>
+                                <td class="border py-2 text-left px-2 relative ">
+                                    <a class="font-bold text-neutral-900 hover:text-orange-400 " href="{{route('task.show' ,
+                                     $task->slug)}}">{{$task->name}}</a>
+
+                                        @php
+                                            $days_left=Carbon\Carbon::parse($task->end_date)->diffInDays(Carbon\Carbon::now());
+                                            if($task->end_date > Carbon\Carbon::now() && $task->status !='complete'){
+                                                if($days_left == 1){
+                                                $percent =95;
+                                                $color='bg-red-700';
+
+                                            }elseif($days_left < 3){
+                                                $percent =75;
+                                                $color='bg-red-400';
+                                            }elseif($days_left < 5){
+                                                $percent =50;
+                                                $color='bg-red-300';
+                                            }else{
+                                                $percent =100;
+                                                $color='bg-green-700';
+                                            }
+                                        }else{
+                                                $percent =100;
+                                                $color='bg-red-500';
+                                            }
+
+                                        @endphp
+
+                                        <div class="counter-class border-t py-1 mt-2 flex justify-end space-x-2 task-{{ $task->id }}"
+                                            data-date="{{ $task->end_date }}">
+                                            @if ($task->end_date > Carbon\Carbon::now() )
+                                                <div class="mx-2 text-sm"><span class="counter-days"></span> Days</div>
+                                                <div class="mx-2 text-sm"><span class="counter-hours"></span> Hours</div>
+                                                <div class="mx-2 text-sm"><span class="counter-minutes"></span> Minutes</div>
+                                                <div class="mx-2 text-sm"><span class="counter-seconds"></span> Seconds</div>
+                                            @else
+                                            <div class="text-sm">{{ $task->status =='pending' ? 'Time Over Due!' : '' }}</div>
+                                            @endif
+
+                                        </div>
+
+                                        <script type="text/javascript">
+                                            $(document).ready(function() {
+                                                loopcounter('task-' + {{ $task->id }});
+                                            });
+                                        </script>
+
+
+                                        @if ($task->status =='complete')
+                                        <div class=" absolute h-1 w-full z-10 bg-teal-600 left-0 bottom-0 "></div>
+                                        @else
+                                        <div class=" absolute h-1 w-[90%] z-10 bg-red-600 left-0 bottom-0 {{ $color }}"
+                                         style="width:{{ $percent }}%;"></div>
+                                        @endif
+
+
+                                     <div class=" absolute h-1 w-full  bg-slate-400 left-0 bottom-0 "></div>
                                     </td>
                                 <td class="border py-2 text-center text-sm">{{$task->price}}</td>
                                 <td class="border py-2 text-center capitalize text-sm">{{$task->status}}
@@ -122,6 +178,9 @@
                                     </form>
 
                                 @endif
+                                </td>
+                                <td class="border py-2 text-center px-3 capitalize">
+                                    {{ $task->priority }}
                                 </td>
                                 <td class="border py-2 text-left px-3 text-sm">
                                     <a class="text-orange-500 hover:text-rose-900" href="{{route('task.index' )}}?client_id={{$task->client->id}}">{{$task->client->name}}</a>

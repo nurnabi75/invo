@@ -36,18 +36,6 @@
                             @enderror
                            </div>
 
-
-                        </div>
-
-                       <div class="mt-6 flex">
-                          <div class="flex-1 mr-4">
-                            <label for="price" class="formlabel">Price</label>
-                            <input type="number" name="price" id="price" class="forminput" value="{{old('price')}}">
-                            @error('price')
-                              <p class="text-red-700 text-sm">{{$message}}</p>
-                            @enderror
-                          </div>
-
                           <div class=" flex-1 ml-4">
                             <label for="client_id" class="formlabel">Client Name</label>
 
@@ -62,6 +50,51 @@
                             </select>
 
                             @error('client_id')
+                              <p class="text-red-700 text-sm">{{$message}}</p>
+                            @enderror
+                          </div>
+
+
+                        </div>
+
+                       <div class="mt-6 flex">
+                          <div class="flex-1 mr-4">
+                            <label for="price" class="formlabel">Price</label>
+                            <input type="number" name="price" id="price" class="forminput" value="{{old('price')}}">
+                            @error('price')
+                              <p class="text-red-700 text-sm">{{$message}}</p>
+                            @enderror
+                          </div>
+
+
+                          <div class=" flex-1 ml-4">
+                            <label for="start_date" class="formlabel">Start Date</label>
+                            <input type="date" name="start_date" id="start_date" class="forminput" value="{{ now()->format('Y-m-d') }}"
+                            max="{{ now()->format('Y-m-d')}}">
+                            @error('start_date')
+                              <p class="text-red-700 text-sm">{{$message}}</p>
+                            @enderror
+                          </div>
+
+                          <div class=" flex-1 ml-4">
+                            <label for="end_date" class="formlabel">End Date</label>
+                            <input type="date" name="end_date" id="end_date" class="forminput"
+                            min="{{ now()->format('Y-m-d')}}">
+                            @error('end_date')
+                              <p class="text-red-700 text-sm">{{$message}}</p>
+                            @enderror
+                          </div>
+
+                          <div class=" flex-1 ml-4">
+                            <label for="priority" class="formlabel">Priority</label>
+                            <select name="priority" id="priority" class="forminput">
+                                <option value="none">Select Priority</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+
+                            @error('priority')
                               <p class="text-red-700 text-sm">{{$message}}</p>
                             @enderror
                           </div>
