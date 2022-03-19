@@ -19,7 +19,7 @@ class TaskFactory extends Factory
     {
         $price =[300,500,800,1500];
         $status =['pending' , 'complete'];
-
+        $priority =['low','medium','high'];
         $name =$this->faker->sentence();
 
         return [
@@ -28,6 +28,7 @@ class TaskFactory extends Factory
             'description' =>$this->faker->sentences(rand(2,5),true),
             'price' =>$price[rand(0,3)],
             'status' =>$status[rand(0,1)],
+            'priority' => $priority[rand(0,2)],
             'client_id' => Client::all()->random()->id,
             'user_id' => User::all()->random()->id,
             'end_date' => Carbon::now()->addDays(rand(2,7))->format('Y-m-d'),

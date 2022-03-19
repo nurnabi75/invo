@@ -25,6 +25,7 @@ class CreateTasksTable extends Migration
             $table->enum('priority', ['low','medium','high'])->default('low');
             $table->foreignId('client_id')->constrained('clients','id')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('user_id');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
