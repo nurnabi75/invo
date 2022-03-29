@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ActivityEvent;
 use App\Jobs\InvoiceEmailjob;
 use App\Mail\InvoiceEmail;
 use App\Models\Client;
@@ -64,6 +65,7 @@ class InvoiceController extends Controller
 
             $tasks=$this->getInvoiceData($request);
         }
+        // event(new ActivityEvent('Invoice '.$task->id.' Create','Invoice'));
         // Return
         return view ('invoice.create')->with([
             'clients' => Client::where('user_id',Auth::user()->id)-> get(),
@@ -83,6 +85,8 @@ class InvoiceController extends Controller
          'status' =>$invoice->status == 'unpaid' ? 'paid' : 'unpaid'
         ]);
 
+        event(new ActivityEvent('Invoice '.$invoice->id.' Updated','Invoice',Auth::id()));
+
         return redirect()->route('invoice.index')->with('success', 'Invoice Payment Mark As Paid');
     }
 
@@ -94,6 +98,8 @@ class InvoiceController extends Controller
     {
         Storage::delete('public/invoices/'.$invoice->download_url);
         $invoice->delete();
+        event(new ActivityEvent('Invoice '.$invoice->id.' Deleted','Invoice',Auth::id()));
+
         return redirect()->route('invoice.index')->with('success' , 'Invoice deleted successful');
     }
 
@@ -133,6 +139,7 @@ class InvoiceController extends Controller
     {
         if(!empty($request->generate)&& $request->generate == 'yes'){
             $this->generate($request);
+
             return redirect()->route('invoice.index')->with('success', 'invoice Created');
         }
         if(!empty($request->preview)&& $request->preview == 'yes'){
@@ -180,6 +187,8 @@ class InvoiceController extends Controller
             'discount'      =>$discount,
             'discount_type'      =>$discount_type,
         ];
+        event(new ActivityEvent('Invoice '.$invo_no.' Generate','Invoice',Auth::id()));
+
         //generation PDF
         $pdf = PDF::loadView('invoice.pdf', $data);
         // store pdf in storage
@@ -210,6 +219,8 @@ class InvoiceController extends Controller
         $invoice->update([
             'email_sent'  =>'yes'
         ]);
+        event(new ActivityEvent('Invoice '.$invoice->id.' Update','Invoice',Auth::id()));
+
         return redirect()->route('invoice.index')->with('success','Email Send');
     }
 

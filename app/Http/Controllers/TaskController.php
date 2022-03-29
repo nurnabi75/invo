@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Client;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use App\Events\ActivityEvent;
 
 class TaskController extends Controller
 {
@@ -66,23 +68,33 @@ class TaskController extends Controller
     public function store(Request $request)
     {
         $this->taskValidation($request);
-
-
-        Task::create([
+        try {
+               //tasks store in database
+        $task = Task::create([
             'name' =>$request->name,
             'slug' =>Str::slug($request->name),
             'price' =>$request->price,
             'description' =>$request->description,
             'client_id' =>$request->client_id,
-            'user_id' =>Auth::user()->id,
+            'user_id' =>Auth::id(),
             'start_date' =>$request->start_date,
             'end_date' =>$request->end_date,
             'priority' =>$request->priority,
-
-
         ]);
+        // dispatch(new ActivityEvent());
+        //ActivityEvent::dispatch();
+        event(new ActivityEvent('Task '.$task->id.' Created','Task',Auth::id()));
 
-        return redirect()->route('task.index')->with('success' , 'Task Created');
+
+
+         // return response
+         return redirect()->route('task.index')->with('success' , 'Task Created');
+        } catch (\Throwable $th) {
+            return redirect()->route('task.index')->with('error' , $th->getMessage());
+        }
+
+
+
     }
 
     /**
@@ -144,9 +156,14 @@ class TaskController extends Controller
             'price' =>$request->price,
             'description' =>$request->description,
             'client_id' =>$request->client_id,
-            'user_id' =>Auth::user()->id,
+            'user_id' =>Auth::id(),
+            'start_date' =>$request->start_date,
+            'end_date' =>$request->end_date,
+            'priority' =>$request->priority,
 
         ]);
+        event(new ActivityEvent('Task '.$task->id.' Updated','Task',Auth::id()));
+
         // Return
         return redirect()->route('task.index')->with('success' , 'Task Updated');
       } catch (\Throwable $th) {
@@ -165,6 +182,7 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         $task->delete();
+        event(new ActivityEvent('Task '.$task->id.' Deleted','Task',Auth::id()));
         return redirect()->route('task.index')->with('success' , 'Task Deleted');
     }
 

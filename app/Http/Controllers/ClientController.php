@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ActivityEvent;
 use App\Models\Client;
 use Facade\FlareClient\Http\Client as HttpClient;
 use Illuminate\Http\Request;
@@ -60,7 +61,7 @@ class ClientController extends Controller
             $request->file('thumbnail')->storeAs('public/uploads', $thumb);
         }
         //Create new client
-        Client::create([
+        $client= Client::create([
             'name' => $request->name,
             'username' => $request->username,
             'email' => $request->email,
@@ -70,6 +71,7 @@ class ClientController extends Controller
             'user_id' => Auth::user()->id,
             'thumbnail' => $thumb,
         ]);
+        event(new ActivityEvent('Client '.$client->id.' Created','Client',Auth::id()));
         //Return response
         return redirect()->route('client.index')->with('success','Client Added Successfully!');
        } catch (\Throwable $th) {
@@ -150,9 +152,10 @@ class ClientController extends Controller
             'phone' => $request->phone,
             'country' => $request->country,
             'status' => $request->status,
-            'user_id' => Auth::user()->id,
+            'user_id' => Auth::id(),
             'thumbnail' => $thumb,
         ]);
+        event(new ActivityEvent('Client '.$client->id.' Updated','Client',Auth::id()));
 
         return redirect()->route('client.index')->with('success','Client Updated');
 
@@ -179,7 +182,7 @@ class ClientController extends Controller
             'status'  => 'inactive'
         ]);
         }
-
+        event(new ActivityEvent('Client '.$client->id.' deleted','Client',Auth::id()));
 
         return redirect()->route('client.index')->with('success','Client Soft Deleted!');
     }

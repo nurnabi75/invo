@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ActivityEvent;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -55,6 +56,7 @@ class SettingsController extends Controller
             'thumbnail' => $thumb,
             'invoice_logo' => $invoice,
         ]);
+        event(new ActivityEvent('User '.$user->id.' Updated','User',Auth::id()));
         //return response
         return redirect()->route('settings.index')->with('success', 'User Updated!');
         } catch (\Throwable $th) {

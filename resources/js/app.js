@@ -33,7 +33,6 @@ $('#task_filter_btn').on('click', function(){
 
 })
 
-
 });
 
 CKEDITOR.replace('description');
