@@ -23,6 +23,7 @@
                                 <th class="border py-2 w-32">Phone</th>
                                 <th class="border py-2 w-32">Country</th>
                                 <th class="border py-2 w-32">Role</th>
+                                <th class="border py-2 w-32">Verified</th>
                                 <th class="border py-2">Action</th>
                             </tr>
                         </thead>
@@ -48,6 +49,7 @@
                                <td class="border py-2 text-center text-sm">{{ $user->phone }}</td>
                                <td class="border py-2 text-center text-sm">{{ $user->country }}</td>
                                <td class="border py-2 text-center text-sm capitalize">{{ $user->role }}</td>
+                               <td class="border py-2 text-center text-sm capitalize">{{ $user->hasVerifiedEmail() ? 'Yes' : 'No'}}</td>
                                 <td class="border py-2 text-center ">
                                     <div class=" flex justify-center">
                                         <a href="{{route('user.edit' , $user)}}" class="bg-emerald-800 text-white px-3 py-1 mr-2 hover:bg-lime-500 ">Edit</a>
