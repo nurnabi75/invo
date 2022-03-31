@@ -25,7 +25,8 @@ class DatabaseSeeder extends Seeder
             'phone' =>'+8801746485745',
             'country' =>'Bangladesh',
             'password' =>bcrypt('123'),
-            'thumbnail' =>'https://picsum.photos/300'
+            'thumbnail' =>'https://picsum.photos/300',
+            'role' =>'admin'
 
         ]);
         // User::create([

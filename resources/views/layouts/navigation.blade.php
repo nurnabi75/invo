@@ -26,6 +26,11 @@
                     <x-nav-link :href="route('invoice.index')" :active="request()->routeIs('invoice.*')">
                         {{ __('Invoices') }}
                     </x-nav-link>
+                    @if (Auth::user()->role == 'admin')
+                    <x-nav-link :href="route('user.index')" :active="request()->routeIs('user.*')">
+                            {{ __('Users') }}
+                    </x-nav-link>
+                    @endif
                 </div>
             </div>
 

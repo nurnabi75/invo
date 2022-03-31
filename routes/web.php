@@ -4,6 +4,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\UserController;
 use App\Mail\InvoiceEmail;
 use App\Models\ActivityLog;
 use App\Models\Client;
@@ -18,7 +19,7 @@ Route::get('/',function(){
 
 //Backend
 
-Route::prefix('/')->middleware(['auth'])->group(function(){
+Route::prefix('/')->middleware(['auth', 'verified'])->group(function(){
 
    // ressorce route start
     Route::get('dashboard', function () {
@@ -33,6 +34,8 @@ Route::prefix('/')->middleware(['auth'])->group(function(){
            'paid_invoices' => $user->invoices->where('status', 'paid'),
        ]);
     })->name('dashboard');
+    //User route
+    Route::resource('user', UserController::class);
     //client route
     Route::resource('client', ClientController::class);
 
