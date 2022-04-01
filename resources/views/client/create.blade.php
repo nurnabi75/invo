@@ -60,7 +60,6 @@
 
                             <select name="country" id="country" class="forminput">
                                 <option value="none">Select country</option>
-
                                 @foreach ($countries as $country )
                                 <option value="{{ $country }}" {{old('country') == $country ? 'selected' :''}}>{{ $country }}</option>
                                 @endforeach

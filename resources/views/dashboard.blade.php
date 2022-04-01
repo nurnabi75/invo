@@ -33,7 +33,7 @@
                 <div class=" flex-1 max-w-none">
                     <h3 class="text-2xl mb-5 font-bold">Todo:</h3>
 
-                    <ul class="bg-green-700 px-10 py-4 inline-block rounded-md">
+                    <ul class="bg-green-700 px-10 py-4 rounded-md">
                         @forelse ($pending_tasks->slice(0,5) as $task )
 
                           @php
@@ -94,27 +94,7 @@
                             <span class=" text-white w-8/12 ">No Activity Found!</span>
                         </li>
                         @endforelse
-
-
-
-                        {{-- @forelse ( $paid_invoices->slice(0,5) as $invoice )
-                        <li class="flex justify-between items-center border-b py-2">
-                            <a class="text-white hover:text-black transition-all duration-300 w-8/12" href=" {{ route('task.show', $task->slug)}}">{{ $task->name}}</a>
-                            @if ($enddate > $startdate)
-                            <span class="text-white text-xs w-3/12 " >{{ $days !=0 ? $days . 'Days,' : '' }} {{ $days !=0 && $hours !=0 ? $hours .'Hours' : '' }}
-                              {{ $minutes. 'Minutes' }} Left</span>
-
-                            @else
-                            <span class="text-white text-xs w-3/12 " >Time Over!</span>
-                            @endif
-
-                          </li>
-                                @empty
-                                <li class="text-white">No Activity Found!</li>
-                        @endforelse --}}
-
                     </ul>
-
                     <h3 class="text-2xl mb-5 font-bold mt-5">Payment History:</h3>
 
                     <ul class="bg-green-600 px-5 py-4 rounded-md">
@@ -125,7 +105,6 @@
                                 @empty
                                 <li class="text-white">No Invoice Found!</li>
                         @endforelse
-
                     </ul>
                 </div>
             </div>

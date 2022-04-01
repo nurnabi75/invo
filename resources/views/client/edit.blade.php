@@ -57,19 +57,13 @@
                        <div class="mt-6 flex justify-between">
                           <div class=" flex-1">
                             <label for="country" class="formlabel">Country</label>
-
                             <select name="country" id="country" class="forminput">
                                 <option value="none">Select country</option>
 
                                 @foreach ($countries as $country )
                                 <option value="{{ $country }}" {{$client->country == $country ? 'selected' :''}}>{{ $country }}</option>
                                 @endforeach
-
                             </select>
-
-
-
-
                             @error('country')
                               <p class="text-red-700 text-sm">{{$message}}</p>
                             @enderror
@@ -94,23 +88,17 @@
                             @error('thumbnail')
                             <p class="text-red-700 text-sm">{{$message}}</p>
                           @enderror
-
-
                           @php
                           function getImageUrl($image){
                               if(str_starts_with($image, 'http')){
                                   return $image;
                               }
-
                               return asset('storage/uploads') . '/' . $image;
-
                           }
                          @endphp
-
                           <div class="w-full text-center absolute">
                               <img src="{{getImageUrl($client->thumbnail)}}" alt="" width="75" class="mx-auto bg-white p-5">
                           </div>
-
                           </div>
                        </div>
 

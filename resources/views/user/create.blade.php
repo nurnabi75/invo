@@ -2,9 +2,9 @@
     <x-slot name="header">
         <div class="flex justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Add New Task') }}
+                {{ __('Add New User') }}
             </h2>
-            <a href="{{route('task.index')}}" class="border  border-emerald-400 px-3 py-1">Back</a>
+            <a href="{{route('user.index')}}" class="border  border-emerald-400 px-3 py-1">Back</a>
         </div>
     </x-slot>
 
@@ -13,107 +13,94 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
 
-                    @if (count($clients)== 0)
-                    <div class="bg-orange-500 text-white text-center p-3">
-                        <p>You don't have any client <a  href="{{route('client.create')}} "
-                            class="bg-black text-white px-3 py-1 rounded-md ml-1 ">Add New Client</a></p>
-                        <p>You have to define client first!</p>
-                    </div>
-                    @endif
-
-
-
-                    <form action="{{route('task.store') }}" method="post" enctype="multipart/form-data">
+                    <form action="{{route('user.store') }}" method="post" enctype="multipart/form-data">
                         @csrf
 
                         <div class="mt-6 flex">
-                           <div class=" flex-1">
-                            <label for="name" class="formlabel">Name</label>
-                            <input  type="text" name="name" id="name" class="forminput " value="{{old('name')}}">
+                            <div class="flex-1 ">
+                                <label for="name" class="formLabel">Name</label>
+                                <input type="text" name="name" id="name" class="forminput" value="{{ old('name')}}">
 
-                            @error('name')
-                                <p class="text-red-700 text-sm">{{$message}}</p>
-                            @enderror
-                           </div>
+                                @error('name')
+                                    <p class="text-red-700 text-sm">{{$message}}</p>
+                                @enderror
 
-                          <div class=" flex-1 ml-4">
-                            <label for="client_id" class="formlabel">Client Name</label>
+                            </div>
 
-                            <select name="client_id" id="client_id" class="forminput">
+                            <div class="flex-1 ml-4">
+                                <label for="email" class="formLabel">Email</label>
+                                <input type="text" name="email" id="email" class="forminput" value="{{ old('email')}}">
 
-                                <option value="none">Selected Client</option>
+                                @error('email')
+                                    <p class="text-red-700 text-sm">{{$message}}</p>
+                                @enderror
+                            </div>
+                            <div class="flex-1 ml-4">
+                                <label for="country" class="formLabel">Country</label>
+                                <select name="country" id="country" class="forminput">
+                                    <option value="none">Select Country</option>
 
-                                @foreach ($clients as $client )
-                                <option  value="{{$client->id}}" {{ $client->id == old('client_id') ? 'selected' : '' }} > {{$client->name}}</option>
-                                @endforeach
+                                    @foreach ($countries as $country)
+                                    <option value="{{ $country }}" {{ old('country') == $country ? 'selected' : '' }}>{{ $country }}</option>
 
-                            </select>
+                                    @endforeach
+                                </select>
 
-                            @error('client_id')
-                              <p class="text-red-700 text-sm">{{$message}}</p>
-                            @enderror
-                          </div>
-
-
+                                @error('country')
+                                    <p class="text-red-700 text-sm">{{$message}}</p>
+                                @enderror
+                            </div>
                         </div>
 
-                       <div class="mt-6 flex">
-                          <div class="flex-1 mr-4">
-                            <label for="price" class="formlabel">Price</label>
-                            <input type="number" name="price" id="price" class="forminput" value="{{old('price')}}">
-                            @error('price')
-                              <p class="text-red-700 text-sm">{{$message}}</p>
-                            @enderror
-                          </div>
+                        <div class="mt-6 flex">
 
+                            <div class="flex-1">
+                                <label for="company" class="formLabel">Company</label>
+                                <input type="text" name="company" id="company" class="forminput" value="{{ old('company')}}">
 
-                          <div class=" flex-1 ml-4">
-                            <label for="start_date" class="formlabel">Start Date</label>
-                            <input type="date" name="start_date" id="start_date" class="forminput" value="{{ now()->format('Y-m-d') }}"
-                            max="{{ now()->format('Y-m-d')}}">
-                            @error('start_date')
-                              <p class="text-red-700 text-sm">{{$message}}</p>
-                            @enderror
-                          </div>
+                                @error('company')
+                                    <p class="text-red-700 text-sm">{{$message}}</p>
+                                @enderror
+                            </div>
+                            <div class="flex-1 ml-4">
+                                <label for="phone" class="formLabel">Phone</label>
+                                <input type="text" name="phone" id="phone" class="forminput" value="{{ old('phone')}}">
 
-                          <div class=" flex-1 ml-4">
-                            <label for="end_date" class="formlabel">End Date</label>
-                            <input type="date" name="end_date" id="end_date" class="forminput"
-                            min="{{ now()->format('Y-m-d')}}">
-                            @error('end_date')
-                              <p class="text-red-700 text-sm">{{$message}}</p>
-                            @enderror
-                          </div>
+                                @error('phone')
+                                    <p class="text-red-700 text-sm">{{$message}}</p>
+                                @enderror
+                            </div>
+                            <div class="flex-1 ml-4">
+                                <label for="password" class="formLabel">Password</label>
+                                <input type="text" name="password" id="password" class="forminput" value="{{ old('password')}}">
 
-                          <div class=" flex-1 ml-4">
-                            <label for="priority" class="formlabel">Priority</label>
-                            <select name="priority" id="priority" class="forminput">
-                                <option value="none">Select Priority</option>
-                                <option value="high">High</option>
-                                <option value="medium">Medium</option>
-                                <option value="low">Low</option>
-                            </select>
+                                @error('password')
+                                    <p class="text-red-700 text-sm">{{$message}}</p>
+                                @enderror
+                            </div>
+                            <div class="flex-1 ml-4">
+                                <label for="password_confirmation" class="formLabel">Confirm Password</label>
+                                <input type="text" name="password_confirmation" id="password_confirmation" class="forminput" value="{{ old('password')}}">
 
-                            @error('priority')
-                              <p class="text-red-700 text-sm">{{$message}}</p>
-                            @enderror
-                          </div>
-                       </div>
+                                @error('password_confirmation')
+                                    <p class="text-red-700 text-sm">{{$message}}</p>
+                                @enderror
+                            </div>
 
-                       <div class="mt-6 flex justify-between">
-                          <div class=" flex-1">
-                            <label for="description" class="formlabel">Description</label>
+                            <div class="flex-1 ml-4">
+                                <label for="role" class="formLabel">Select role</label>
+                                <select name="role" id="role" class="forminput">
+                                    <option value="none">Role</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="user">User</option>
+                                </select>
 
-                            <textarea name="description" id="description" rows="10" class="forminput">
-                                {{ old('description')}}
-                            </textarea>
+                                @error('role')
+                                    <p class="text-red-700 text-sm">{{$message}}</p>
+                                @enderror
+                            </div>
+                        </div>
 
-                            @error('description')
-                              <p class="text-red-700 text-sm">{{$message}}</p>
-                            @enderror
-                          </div>
-
-                       </div>
 
                         <div class="mt-6">
                             <button type="submit" class="px-4 py-2 text-base uppercase bg-emerald-400 text-white rounded-md">Create</button>

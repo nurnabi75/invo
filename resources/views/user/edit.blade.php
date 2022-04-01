@@ -2,9 +2,9 @@
     <x-slot name="header">
         <div class="flex justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Edit Task') }}
+                {{ __('Edit User') }}
             </h2>
-            <a href="{{route('task.index')}}" class="border  border-emerald-400 px-3 py-1">Back</a>
+            <a href="{{route('user.index')}}" class="border  border-emerald-400 px-3 py-1">Back</a>
         </div>
     </x-slot>
 
@@ -13,7 +13,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
 
-                    <form action="{{route('task.update' , $task->id) }}" method="post" enctype="multipart/form-data">
+                    <form action="{{route('user.update' , $user->id) }}" method="post" enctype="multipart/form-data">
                         @csrf
 
                         @method('PUT')
@@ -21,27 +21,24 @@
                         <div class="mt-6 flex">
                            <div class=" flex-1 mr-4">
                             <label for="name" class="formlabel">Name</label>
-                            <input type="text" name="name" id="name" class="forminput" value="{{$task->name}}">
+                            <input type="text" name="name" id="name" class="forminput" value="{{$user->name}}">
 
                             @error('name')
                                 <p class="text-red-700 text-sm">{{$message}}</p>
                             @enderror
                            </div>
 
-                           <div class=" flex-1 ml-4">
-                            <label for="client_id" class="formlabel">Client Name</label>
-
-                            <select name="client_id" id="client_id" class="forminput">
-
-                                <option value="none">Selected Client</option>
-
-                                @foreach ($clients as $client )
-                                <option value="{{$client->id}}" {{ $client->id == $task->client_id ? 'selected' : '' }} > {{$client->name}}</option>
-                                @endforeach
-
-                            </select>
-
-                            @error('client_id')
+                           <div class="flex-1 mr-4">
+                            <label for="email" class="formlabel">Email</label>
+                            <input type="text" name="email" id="email" class="forminput" value="{{$user->email}}">
+                            @error('email')
+                              <p class="text-red-700 text-sm">{{$message}}</p>
+                            @enderror
+                          </div>
+                          <div class=" flex-1 ml-4">
+                            <label for="company" class="formlabel">Company</label>
+                            <input type="text" name="company" id="company" class="forminput" value="{{$user->company}}">
+                            @error('phone')
                               <p class="text-red-700 text-sm">{{$message}}</p>
                             @enderror
                           </div>
@@ -49,65 +46,62 @@
 
 
                        <div class="mt-6 flex">
-                          <div class="flex-1 mr-4">
-                            <label for="price" class="formlabel">Price</label>
-                            <input type="number" name="price" id="price" class="forminput" value="{{$task->price}}">
-                            @error('price')
+                        <div class=" flex-1 mr-4">
+                            <label for="phone" class="formlabel">Phone</label>
+                            <input type="text" name="phone" id="phone" class="forminput" value="{{$user->phone}}">
+                            @error('phone')
                               <p class="text-red-700 text-sm">{{$message}}</p>
                             @enderror
                           </div>
+                          <div class="flex-1">
+                            <label for="role" class="formLabel">Role</label>
+                            <select name="role" id="role" class="forminput">
+                                <option value="none">Select Role</option>
+                                <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin
+                                </option>
+                                <option value="user" {{ $user->role == 'user' ? 'selected' : '' }}>User</option>
 
-                          <div class=" flex-1 ml-4">
-                            <label for="start_date" class="formlabel">Start Date</label>
-                            {{-- <input type="date" name="start_date" id="start_date" class="forminput" value="{{ now()->format('Y-m-d') }}"
-                            max="{{ now()->format('Y-m-d')}}"> --}}
-                            <input type="date" class="forminput" name="start_date" id="start_date" value="{{ Carbon\Carbon::parse($task->start_date)->format('Y-m-d') }}"
-                                    min="{{ now()->format('Y-m-d') }}">
-                            @error('start_date')
-                              <p class="text-red-700 text-sm">{{$message}}</p>
-                            @enderror
-                          </div>
-
-                          <div class=" flex-1 ml-4">
-                            <label for="end_date" class="formlabel">End Date</label>
-                            {{-- <input type="date" name="end_date" id="end_date" class="forminput"
-                            min="{{ now()->format('Y-m-d')}}"> --}}
-                            <input type="date" class="forminput" name="end_date" id="end_date" value="{{ Carbon\Carbon::parse($task->end_date)->format('Y-m-d') }}"
-                                    min="{{ now()->format('Y-m-d') }}">
-                            @error('end_date')
-                              <p class="text-red-700 text-sm">{{$message}}</p>
-                            @enderror
-                          </div>
-                          <div class=" flex-1 ml-4">
-                            <label for="priority" class="formlabel">Priority</label>
-                            <select name="priority" id="priority" class="forminput">
-                                <option value="none">Select Priority</option>
-                                <option value="high">High</option>
-                                <option value="medium">Medium</option>
-                                <option value="low">Low</option>
                             </select>
 
-                            @error('priority')
-                              <p class="text-red-700 text-sm">{{$message}}</p>
+                            @error('role')
+                                <p class="text-red-700 text-sm">{{ $message }}</p>
                             @enderror
-                          </div>
+                        </div>
+                        <div class="flex-1 ml-4">
+                          <label for="country" class="formLabel">Country</label>
+                          <select name="country" id="country" class="forminput">
+                              <option value="none">Select Country</option>
+                              @foreach ($countries as $country)
+                              <option value="{{ $country }}" {{ $user->country == $country ? 'selected' : '' }}>{{ $country }}</option>
 
-
-                       </div>
-
-                       <div class="mt-6 flex justify-between">
-                          <div class=" flex-1">
-                            <label for="description" class="formlabel">Description</label>
-
-                            <textarea name="description" id="description" rows="10" class="forminput">
-                                {{$task->description}}
-                            </textarea>
-
-                            @error('description')
+                              @endforeach
+                          </select>
+                          @error('country')
                               <p class="text-red-700 text-sm">{{$message}}</p>
-                            @enderror
-                          </div>
+                          @enderror
+                      </div>
 
+                          <div class=" flex-1 relative ml-4">
+                            <label for="" class="formlabel">thumbnail</label>
+                          <label for="thumbnail" class="formlabel border-2 rounded-md border-dashed border-emerald-700
+                          py-3 text-center">Click to upload Image</label>
+                          <input type="file" name="thumbnail" id="thumbnail" class="forminput hidden" >
+                          @error('thumbnail')
+                          <p class="text-red-700 text-sm">{{$message}}</p>
+                        @enderror
+                        @php
+                        function getImageUrl($image){
+                            if(str_starts_with($image, 'http')){
+                                return $image;
+                            }
+                            return asset('storage/uploads') . '/' . $image;
+                        }
+                       @endphp
+                        <div class="w-full text-center absolute">
+                            <img src="{{getImageUrl($user->thumbnail)}}" alt="" width="75" class="mx-auto bg-white p-5">
+                        </div>
+                        </div>
+                     </div>
                        </div>
 
                         <div class="mt-6">
