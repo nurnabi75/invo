@@ -81,15 +81,12 @@ class TaskController extends Controller
             'end_date' =>$request->end_date,
             'priority' =>$request->priority,
         ]);
-        // dispatch(new ActivityEvent());
-        //ActivityEvent::dispatch();
+        // Event fire
         event(new ActivityEvent('Task '.$task->id.' Created','Task',Auth::id()));
-
-
-
          // return response
          return redirect()->route('task.index')->with('success' , 'Task Created');
         } catch (\Throwable $th) {
+            //throw $th;
             return redirect()->route('task.index')->with('error' , $th->getMessage());
         }
 
@@ -162,12 +159,11 @@ class TaskController extends Controller
             'priority' =>$request->priority,
 
         ]);
+        // Event fire
         event(new ActivityEvent('Task '.$task->id.' Updated','Task',Auth::id()));
-
-        // Return
+        // Return REsponse
         return redirect()->route('task.index')->with('success' , 'Task Updated');
       } catch (\Throwable $th) {
-
         //Throw $th
         return redirect()->route('task.index')->with('error' , $th->getMessage());
       }
@@ -181,18 +177,32 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        $task->delete();
-        event(new ActivityEvent('Task '.$task->id.' Deleted','Task',Auth::id()));
-        return redirect()->route('task.index')->with('success' , 'Task Deleted');
+        try {
+            // task delete
+            $task->delete();
+            // Event fire
+            event(new ActivityEvent('Task '.$task->id.' Deleted','Task',Auth::id()));
+            // Retrun Response
+            return redirect()->route('task.index')->with('success' , 'Task Deleted');
+        } catch (\Throwable $th) {
+            //throw $th;
+            return redirect()->route('task.index')->with('error', $th->getMessage());
+        }
     }
 
     public function markAsComplete(Task $task)
     {
 
+       try {
+           // task update
         $task->update([
             'status'=>'complete'
         ]);
-
-        return redirect()->back()->with('success' , 'Mark as completed');;
+        // retrun response
+        return redirect()->back()->with('success' , 'Mark as completed');
+       } catch (\Throwable $th) {
+           //throw $th;
+           return redirect()->route('task.index')->with('error', $th->getMessage());
+       }
     }
 }

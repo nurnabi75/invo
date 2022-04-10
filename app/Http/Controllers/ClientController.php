@@ -133,8 +133,10 @@ class ClientController extends Controller
 
         ]);
 
-        $thumb = $client->thumbnail;
-
+        try {
+            // Default thumbnail from database
+            $thumb = $client->thumbnail;
+            // Upload new thumbnail
         if(!empty($request->file('thumbnail')) ){
 
             Storage::delete('public/uploads/'.$thumb);
@@ -145,7 +147,7 @@ class ClientController extends Controller
         }
 
         Client::find($client->id)->update([
-
+            // Update client data
             'name' => $request->name,
             'username' => $request->username,
             'email' => $request->email,
@@ -155,9 +157,15 @@ class ClientController extends Controller
             'user_id' => Auth::id(),
             'thumbnail' => $thumb,
         ]);
+        //Event fire
         event(new ActivityEvent('Client '.$client->id.' Updated','Client',Auth::id()));
-
+        // Return Response
         return redirect()->route('client.index')->with('success','Client Updated');
+        } catch (\Throwable $th) {
+            //throw $th;
+            return redirect()->route('client.index')->with('error',$th->getMessage());
+
+        }
 
     }
 
@@ -169,22 +177,27 @@ class ClientController extends Controller
      */
     public function destroy(Client $client)
     {
-
-
+        // find all pending tasks of the client
         $pending_tasks = $client->tasks->where('status', 'pending');
+        try {
+            // Soft delete or delete depending on the condition
+            if(count($pending_tasks) == 0){
+                Storage::delete('public/uploads/'.$client->thumbnail);
+                $client->delete();
+            }else{
+            $client->update([
+                'status'  => 'inactive'
+            ]);
+            }
+            //Event fire
+            event(new ActivityEvent('Client '.$client->id.' deleted','Client',Auth::id()));
+            // Return Response
+            return redirect()->route('client.index')->with('success','Client Soft Deleted!');
+        } catch (\Throwable $th) {
+            //throw $th;
+            return redirect()->route('client.index')->with('error',$th->getMessage());
 
-        if(count($pending_tasks) == 0){
-            Storage::delete('public/uploads/'.$client->thumbnail);
-            $client->delete();
-        }else{
-
-        $client->update([
-            'status'  => 'inactive'
-        ]);
         }
-        event(new ActivityEvent('Client '.$client->id.' deleted','Client',Auth::id()));
-
-        return redirect()->route('client.index')->with('success','Client Soft Deleted!');
     }
 
 

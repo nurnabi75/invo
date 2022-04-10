@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Events\ActivityEvent;
-use App\Jobs\InvoiceEmailjob;
 use App\Mail\InvoiceEmail;
 use App\Models\Client;
 use App\Models\Invoice;
@@ -81,13 +80,19 @@ class InvoiceController extends Controller
 
     public function update(Request $request, Invoice $invoice)
     {
+     try {
         $invoice->update([
-         'status' =>$invoice->status == 'unpaid' ? 'paid' : 'unpaid'
-        ]);
-
-        event(new ActivityEvent('Invoice '.$invoice->id.' Updated','Invoice',Auth::id()));
-
-        return redirect()->route('invoice.index')->with('success', 'Invoice Payment Mark As Paid');
+            // update status
+            'status' =>$invoice->status == 'unpaid' ? 'paid' : 'unpaid'
+           ]);
+           //Event fire
+           event(new ActivityEvent('Invoice '.$invoice->id.' Updated','Invoice',Auth::id()));
+           // return response
+           return redirect()->route('invoice.index')->with('success', 'Invoice Payment Mark As Paid');
+     } catch (\Throwable $th) {
+         //throw $th;
+         return redirect()->route('invoice.index')->with('error', $th->getMessage());
+     }
     }
 
        /**
@@ -96,11 +101,19 @@ class InvoiceController extends Controller
     */
       public function destroy(Invoice $invoice)
     {
+      try {
+           // delete pdf file
         Storage::delete('public/invoices/'.$invoice->download_url);
+         // delete data from database
         $invoice->delete();
+        // Event Fire
         event(new ActivityEvent('Invoice '.$invoice->id.' Deleted','Invoice',Auth::id()));
-
+         // return response
         return redirect()->route('invoice.index')->with('success' , 'Invoice deleted successful');
+      } catch (\Throwable $th) {
+          //throw $th;
+          return redirect()->route('invoice.index')->with('error', $th->getMessage());
+      }
     }
 
     /**
@@ -110,20 +123,31 @@ class InvoiceController extends Controller
 
     public function getInvoiceData(Request $request)
     {
+      try {
+          // Get latest tasks
         $tasks =Task::latest();
+        // filter by clients
         if(!empty($request->client_id) ){
             $tasks = $tasks->where('client_id', '=' , $request->client_id);
         }
+         // filter by status
         if(!empty($request->status) ){
             $tasks = $tasks->where('status', '=' , $request->status);
         }
+        // filter by from date
         if(!empty($request->formDate) ){
           $tasks = $tasks->whereDate('created_at', '>=' , $request->formDate);
          }
+         // filter by end date
         if(!empty($request->endDate) ){
          $tasks = $tasks->whereDate('created_at', '<=' , $request->endDate);
          }
+         // return tasks
          return $tasks->get();
+      } catch (\Throwable $th) {
+          //throw $th;
+          return false;
+      }
     }
 
     /**
@@ -137,13 +161,21 @@ class InvoiceController extends Controller
 //invoice generate function preview
     public function invoice(Request $request)
     {
+         // if rewuest is generate
         if(!empty($request->generate)&& $request->generate == 'yes'){
-            $this->generate($request);
-
-            return redirect()->route('invoice.index')->with('success', 'invoice Created');
+            try {
+                 // generate invoice pdf
+                $this->generate($request);
+                 // return resposne
+                return redirect()->route('invoice.index')->with('success', 'invoice Created');
+            } catch (\Throwable $th) {
+                //throw $th;
+                return redirect()->route('invoice.index')->with('error', $th->getMessage());
+            }
         }
+        // if request is preview invoice
         if(!empty($request->preview)&& $request->preview == 'yes'){
-
+            // check discount and discount type
             if(!empty($request->discount) && !empty($request->discount_type) ){
                 $discount = $request->discount;
                 $discount_type = $request->discount_type;
@@ -151,14 +183,16 @@ class InvoiceController extends Controller
                 $discount = 0;
                 $discount_type = '';
             }
+             // get tasks from request ids
             $tasks = Task::whereIn('id',$request->invoice_ids)->get();
-        return view('invoice.preview')->with([
+             // return view with invoice
+           return view('invoice.preview')->with([
             'invoice_no' => 'INVO_'.rand(25855263525,25655554566),
             'user'       => Auth::user(),
             'tasks'      =>$tasks,
             'discount'      =>$discount,
             'discount_type'      =>$discount_type,
-        ]);
+           ]);
         }
     }
 
@@ -169,6 +203,7 @@ class InvoiceController extends Controller
     */
     public function generate(Request $request)
     {
+            // check discount and discount type
             if(!empty($request->discount) && !empty($request->discount_type) ){
                 $discount = $request->discount;
                 $discount_type = $request->discount_type;
@@ -176,18 +211,19 @@ class InvoiceController extends Controller
                 $discount = 0;
                 $discount_type = '';
             }
-
-        $invo_no ='INVO_'.rand(25855263525,25655554566);
-
-        $tasks = Task::whereIn('id',$request->invoice_ids)->get();
-        $data=[
+            // generate invoice random id
+           $invo_no ='INVO_'.rand(25855263525,25655554566);
+            // get tasks from request ids
+            $tasks = Task::whereIn('id',$request->invoice_ids)->get();
+            // get all data into an array
+           $data=[
             'invoice_no' =>$invo_no ,
             'user'       => Auth::user(),
             'tasks'      =>$tasks,
             'discount'      =>$discount,
             'discount_type'      =>$discount_type,
-        ];
-        event(new ActivityEvent('Invoice '.$invo_no.' Generate','Invoice',Auth::id()));
+          ];
+
 
         //generation PDF
         $pdf = PDF::loadView('invoice.pdf', $data);
@@ -202,26 +238,35 @@ class InvoiceController extends Controller
             'amount'     =>$tasks->sum('price'),
             'download_url'=>$invo_no.'.pdf',
         ]);
+        // Event fire
+        event(new ActivityEvent('Invoice '.$invo_no.' Generate','Invoice',Auth::id()));
     }
 
      public function sendEmail(Invoice $invoice)
     {
+       try {
+           // get all data into an array
         $data =[
             'user'        => Auth::user(),
             'invoice_id'  => $invoice->invoice_id,
             'invoice'     => $invoice,
             'pdf'     =>public_path('storage/invoices/'.$invoice->download_url),
         ];
-       // InvoiceEmailjob::dispatch($data);
 
+         // Email initialize with Mailable and Queue
        Mail::to($invoice->client)->send(new InvoiceEmail($data));
-
+        // update invoice email sent status
         $invoice->update([
             'email_sent'  =>'yes'
         ]);
-        event(new ActivityEvent('Invoice '.$invoice->id.' Update','Invoice',Auth::id()));
-
+        //Event Fire
+        event(new ActivityEvent('Invoice '.$invoice->id.' Send Email','Invoice',Auth::id()));
+        // return response
         return redirect()->route('invoice.index')->with('success','Email Send');
+       } catch (\Throwable $th) {
+           //throw $th;
+           return redirect()->route('invoice.index')->with('error', $th->getMessage());
+       }
     }
 
 }

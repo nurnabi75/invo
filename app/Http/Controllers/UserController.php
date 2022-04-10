@@ -51,18 +51,33 @@ class UserController extends Controller
             'phone'    => ['max: 255', 'string'],
             'role'     => ['required', 'max: 255', 'string', 'not_in:none'],
         ] );
+            try {
+                // User Create
+                $user = User::create( [
+                    'name'     => $request->name,
+                    'email'    => $request->email,
+                    'password' => bcrypt( $request->password ),
+                    'country'  => $request->country,
+                    'company'  => $request->company,
+                    'phone'    => $request->phone,
+                    'role'     => $request->role,
+                ] );
+                //Email verification
+                $user->markEmailAsVerified();
 
-        User::create( [
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => bcrypt( $request->password ),
-            'country'  => $request->country,
-            'company'  => $request->company,
-            'phone'    => $request->phone,
-            'role'     => $request->role,
-        ] );
+                //event fire
+                event(new ActivityEvent('User '.$user->name.' Create','User',Auth::id()));
+                //Retrun Response
+                return redirect()->route( 'user.index' )->with( 'success', 'User Added Successfully' );
 
-        return redirect()->route( 'user.index' )->with( 'success', 'User Added Successfully' );
+            } catch (\Throwable $th) {
+                //throw $th;
+                return redirect()->route('user.index')->with('error', $th->getMessage());
+            }
+
+
+
+
     }
 
     /**
@@ -84,6 +99,7 @@ class UserController extends Controller
      */
     public function edit(User $user )
     {
+        // User Edit
         return view( 'user.edit' )->with( [
             'user'      => $user,
             'countries' => $this->countries_list,
@@ -97,43 +113,38 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update( Request $request )
+    public function update( Request $request, User $user )
     {
+        // Valodation User field
         $request->validate([
-
             'name' => ['required','max:255','string'],
             'email' => ['required','max:255','string','email'],
             'phone' => ['max:255','string'],
             'country' => ['max:255','string', 'not_in:none'],
             'company'   => ['max:255', 'string'],
             'role'      => ['required', 'max:255', 'string'],
-            'thumbnail' => ['image'],
 
         ]);
-        $user = User::find( Auth::id() );
-        $thumb = $user->thumbnail;
 
-        if(!empty($request->file('thumbnail')) ){
-
-            Storage::delete('public/uploads/'.$thumb);
-
-            $thumb = time() . '-' . $request->file('thumbnail')->getClientOriginalName();
-
-            $request->file('thumbnail')->storeAs('public/uploads', $thumb);
+        try {
+            // User Update
+            $user->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'country' => $request->country,
+                'company' => $request->company,
+                'role' => $request->role,
+            ]);
+            // Event
+            event(new ActivityEvent('User '.$user->name.' Updated','User',Auth::id()));
+             // Return Response
+            return redirect()->route('user.index')->with('success','User Updated');
+        } catch (\Throwable $th) {
+            //throw $th;
+            return redirect()->route('user.index')->with('error', $th->getMessage());
         }
 
-        $user->update([
-
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'country' => $request->country,
-            'role' => $request->role,
-            'thumbnail' => $thumb,
-        ]);
-        event(new ActivityEvent('User '.$user->id.' Updated','User',Auth::id()));
-
-        return redirect()->route('user.index')->with('success','User Updated');
     }
 
     /**
@@ -149,7 +160,8 @@ class UserController extends Controller
                 return redirect()->route('user.index')->with('error','User is logged in, can\'t Deleted');
             }else{
                 $user->delete();
-                //event(new ActivityEvent('user '.$user->id.' deleted','user',Auth::id()));
+                //Event Fire
+                event(new ActivityEvent('user '.$user->name.' deleted','user',Auth::id()));
                 return redirect()->route('user.index')->with('success','User Deleted');
 
             }
